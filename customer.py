@@ -1,6 +1,5 @@
 class Customer:
     def __init__(self, name):
-        self._name = None
         self.name = name
         self._orders = []
 
@@ -19,9 +18,10 @@ class Customer:
         return self._orders
 
     def coffees(self):
-        return list(set(order.coffee for order in self._orders))
+        return list({order.coffee for order in self._orders})
 
     def create_order(self, coffee, price):
+        from order import Order
         order = Order(self, coffee, price)
         self._orders.append(order)
         coffee._orders.append(order)
@@ -29,11 +29,8 @@ class Customer:
 
     @classmethod
     def most_aficionado(cls, coffee):
-        max_spent = 0
-        top_customer = None
-        for customer in coffee.customers():
-            total_spent = sum(order.price for order in customer.orders() if order.coffee == coffee)
-            if total_spent > max_spent:
-                max_spent = total_spent
-                top_customer = customer
-        return top_customer
+        customer_spending = {}
+        for order in coffee.orders():
+            customer = order.customer
+            customer_spending[customer] = customer_spending.get(customer, 0) + order.price
+        return max(customer_spending, key=customer_spending.get, default=None)

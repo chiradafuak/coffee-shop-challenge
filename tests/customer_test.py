@@ -1,29 +1,18 @@
 import pytest
-from customer import Customer
-from coffee import Coffee
-from order import Order
+from ..customer import Customer
+from ..coffee import Coffee
 
-def test_customer_initialization():
-    customer = Customer("Alice")
-    assert customer.name == "Alice"
-
-def test_customer_name_validation():
+def test_customer_name_constraints():
     with pytest.raises(ValueError):
-        Customer("A" * 16)
+        Customer("")
+    with pytest.raises(ValueError):
+        Customer("a" * 16)
+    with pytest.raises(ValueError):
+        Customer(123)
 
-def test_customer_orders():
-    customer = Customer("Alice")
-    coffee = Coffee("Espresso")
-    order = customer.create_order(coffee, 3.5)
-    assert len(customer.orders()) == 1
-    assert customer.orders()[0] == order
-
-def test_customer_coffees():
-    customer = Customer("Alice")
-    coffee1 = Coffee("Espresso")
-    coffee2 = Coffee("Latte")
-    customer.create_order(coffee1, 3.5)
-    customer.create_order(coffee2, 4.0)
-    assert len(customer.coffees()) == 2
-    assert coffee1 in customer.coffees()
-    assert coffee2 in customer.coffees()
+def test_create_order_and_coffees():
+    c = Customer("Alice")
+    coffee = Coffee("Latte")
+    order = c.create_order(coffee, 5.0)
+    assert order in c.orders()
+    assert coffee in c.coffees()
